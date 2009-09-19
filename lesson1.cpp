@@ -53,13 +53,13 @@ UINT cubeIndicesCount = SIZE(cubeIndices);
 
 D3D::Vertex testVertices[] =
 {
-	{ 100.0f, 100.0f, 2.0f, 1.0f, Red },
-	{ 200.0f, 150.0f, 1.0f, 1.0f, Red },
-	{ 100.0f, 200.0f, 2.0f, 1.0f, Red },
+	{ 100.0f, 100.0f, 0.20f, 1.0f, Red },
+	{ 200.0f, 150.0f, 0.30f, 1.0f, Red },
+	{ 100.0f, 200.0f, 0.20f, 1.0f, Red },
 
-	{ 200.0f, 200.0f, 2.0f, 1.0f, Blue },
-	{ 100.0f, 150.0f, 1.0f, 1.0f, Blue },
-	{ 200.0f, 100.0f, 2.0f, 1.0f, Blue },
+	{ 200.0f, 200.0f, 0.20f, 1.0f, Blue },
+	{ 100.0f, 150.0f, 0.30f, 1.0f, Blue },
+	{ 200.0f, 100.0f, 0.20f, 1.0f, Blue },
 };
 UINT testVerticesCount = SIZE(testVertices);
 
@@ -92,16 +92,20 @@ ATOM				MyRegisterClass(HINSTANCE hInstance);
 HWND				CreateMainWindow(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
-void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vertexBuffer, D3D::IndexBuffer& indexBuffer)
+void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vertexBuffer, 
+			D3D::IndexBuffer& indexBuffer, D3D::Shader& shader)
 {
 	using D3D::CheckResult;
 
-	CheckResult( device->Clear( 0, NULL, D3DCLEAR_TARGET, Gray, 1.0f, 0 ) );
+	CheckResult( device->Clear( 0, NULL, D3DCLEAR_TARGET/*|D3DCLEAR_ZBUFFER*/, Gray, 1.0f, 0 ) );
 	CheckResult( device->BeginScene());
+
 	CheckResult( device->SetStreamSource( 0, vertexBuffer.GetBuffer(), 0, sizeof( D3D::Vertex ) ) );
 	CheckResult( device->SetIndices(indexBuffer.GetBuffer()) );
-	CheckResult( device->SetFVF( D3DFVF_CUSTOMVERTEX ) );
+	
+	CheckResult( device->SetVertexShader(shader.GetShader()) );
 	CheckResult( device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, verticesCount, 0, indicesCount/3 ) );
+
 	CheckResult( device->EndScene() );
 	CheckResult( device->Present( NULL, NULL, NULL, NULL ) );
 }
@@ -137,9 +141,23 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	D3D::GraphicDevice graphicDevice( mainWindow, params );
 	graphicDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 	//graphicDevice->SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
+	//graphicDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
 
+	D3DVERTEXELEMENT9 vd[] = 
+	{
+		{0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+		D3DDECL_END()
 
-	//D3D::Shader shader(graphicDevice);
+	};
+
+	D3D::VertexDeclaration vertexDeclaration(graphicDevice, vd);
+	D3D::CheckResult( graphicDevice->SetVertexDeclaration(vertexDeclaration.GetDeclaration()) );
+
+	D3D::Shader shader(graphicDevice, L"shader.vsh");
+	D3D::CheckResult( graphicDevice->SetVertexShader(shader.GetShader()) );
+
+	//D3D::CheckResult( graphicDevice->SetFVF(D3DFVF_CUSTOMVERTEX) );
 
 	D3D::VertexBuffer vertexBuffer(graphicDevice, sizeof(D3D::Vertex)*verticesCount);
 	vertexBuffer.Set(vertices, sizeof(D3D::Vertex)*verticesCount);
@@ -160,7 +178,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
             DispatchMessage( &msg );
         }
         else
-            Render(graphicDevice, vertexBuffer, indexBuffer);
+            Render(graphicDevice, vertexBuffer, indexBuffer, shader);
     }
 	return (int) msg.wParam;
 }

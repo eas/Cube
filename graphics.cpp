@@ -88,43 +88,41 @@ namespace D3D
 			directX_->Release();
 	}
 
-	Shader::Shader(GraphicDevice& device)
-		:shader_(NULL), vertexDeclaration_(NULL)
+	//Shader::Shader(GraphicDevice& device)
+	//	:shader_(NULL), vertexDeclaration_(NULL)
+	//{
+	//	D3DVERTEXELEMENT9 vertexDeclaration[] = 
+	//	{
+	//		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+	//		{0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+	//		D3DDECL_END()
+
+	//	};
+
+	//	CheckResult( device->CreateVertexDeclaration(vertexDeclaration, &vertexDeclaration_) );
+
+	//	ID3DXBuffer* shaderCode = NULL;
+
+	//	CheckResult( D3DXAssembleShaderFromFile(L"shader.vsh", NULL, NULL, NULL, &shaderCode, NULL) );
+	//	CheckResult( device->CreateVertexShader(static_cast<DWORD*>(shaderCode->GetBufferPointer()), &shader_) );
+	//	shaderCode->Release();
+
+	//	float matrix[] =
+	//	{
+	//		1.0f, 0.0f, 0.0f, 0.0f,
+	//		0.0f, 1.0f, 0.0f, 0.0f,
+	//		0.0f, 0.0f, 1.0f, 0.0f,
+	//		0.0f, 0.0f, 0.0f, 1.0f,
+	//	};
+
+	//	CheckResult( device->SetVertexShaderConstantF(0, matrix, 4) );
+
+	//	CheckResult( device->SetVertexShader(shader_) );
+	//}
+
+	Shader::Shader(GraphicDevice& device, LPCTSTR fileName)
+		:shader_(NULL)
 	{
-		D3DVERTEXELEMENT9 vertexDeclaration[] = 
-		{
-			{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-			{0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
-			D3DDECL_END()
-
-		};
-
-		CheckResult( device->CreateVertexDeclaration(vertexDeclaration, &vertexDeclaration_) );
-
-		ID3DXBuffer* shaderCode = NULL;
-
-		CheckResult( D3DXAssembleShaderFromFile(L"shader.vsh", NULL, NULL, NULL, &shaderCode, NULL) );
-		CheckResult( device->CreateVertexShader(static_cast<DWORD*>(shaderCode->GetBufferPointer()), &shader_) );
-		shaderCode->Release();
-
-		float matrix[] =
-		{
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f,
-		};
-
-		CheckResult( device->SetVertexShaderConstantF(0, matrix, 4) );
-
-		CheckResult( device->SetVertexShader(shader_) );
-	}
-
-	Shader::Shader(GraphicDevice& device, LPCTSTR fileName, D3DVERTEXELEMENT9 vertexDeclaration[])
-		:shader_(NULL), vertexDeclaration_(NULL)
-	{
-		CheckResult( device->CreateVertexDeclaration(vertexDeclaration, &vertexDeclaration_) );
-
 		ID3DXBuffer* shaderCode = NULL;
 
 		CheckResult( D3DXAssembleShaderFromFile(fileName, NULL, NULL, NULL, &shaderCode, NULL) );
@@ -132,13 +130,11 @@ namespace D3D
 
 		shaderCode->Release();
 
-		CheckResult( device->SetVertexShader(shader_) );
+		//CheckResult( device->SetVertexShader(shader_) );
 		
 	}
 	Shader::~Shader()
 	{
-		if( vertexDeclaration_ != NULL )
-			vertexDeclaration_->Release();
 		if( shader_ != NULL )
 			shader_->Release();
 	}
@@ -185,6 +181,17 @@ namespace D3D
 		CheckResult( indexBuffer_->Lock(0, sizeToLock, &buffer, 0) );
 		memcpy( buffer, indices, sizeToLock);
 		CheckResult( indexBuffer_->Unlock() );
+	}
+
+	VertexDeclaration::VertexDeclaration(GraphicDevice& device, D3DVERTEXELEMENT9 vertexDeclaration[])
+		:vertexDeclaration_(NULL)
+	{
+		CheckResult( device->CreateVertexDeclaration(vertexDeclaration, &vertexDeclaration_) );
+	}
+	VertexDeclaration::~VertexDeclaration()
+	{
+		if(vertexDeclaration_ != NULL)
+			vertexDeclaration_->Release();
 	}
 
 } // namespace D3D

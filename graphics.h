@@ -55,11 +55,14 @@ namespace D3D
 	class Shader
 	{
 	public:
-		Shader(GraphicDevice& device);
-		Shader::Shader(GraphicDevice& device, LPCTSTR fileName, D3DVERTEXELEMENT9 vertexDeclaration[]);
+		//Shader(GraphicDevice& device);
+		Shader::Shader(GraphicDevice& device, LPCTSTR fileName);
+		IDirect3DVertexShader9* GetShader()
+		{
+			return shader_;
+		}
 		~Shader();
 	private:
-		IDirect3DVertexDeclaration9* vertexDeclaration_;
 		IDirect3DVertexShader9* shader_;
 	};
 
@@ -97,5 +100,18 @@ namespace D3D
 		}
 	private:
 		IDirect3DIndexBuffer9* indexBuffer_;
+	};
+
+	class VertexDeclaration
+	{
+	public:
+		VertexDeclaration(GraphicDevice& device, D3DVERTEXELEMENT9 vertexDeclaration[]);
+		~VertexDeclaration();
+		IDirect3DVertexDeclaration9* GetDeclaration()
+		{
+			return vertexDeclaration_;
+		}
+	private:
+		IDirect3DVertexDeclaration9* vertexDeclaration_;
 	};
 } // namespace D3D
