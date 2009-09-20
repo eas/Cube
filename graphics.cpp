@@ -46,8 +46,6 @@ namespace D3D
 		device_->AddRef();
 	}
 
-
-
 	GraphicDevice::~GraphicDevice()
 	{
 
@@ -57,7 +55,6 @@ namespace D3D
 		if( directX_ != NULL )
 			directX_->Release();
 	}
-
 
 	Shader::Shader(GraphicDevice& device, LPCTSTR fileName)
 		:Base(device), shader_(NULL)
@@ -71,6 +68,7 @@ namespace D3D
 
 		shaderCode->Release();
 	}
+
 	Shader::~Shader()
 	{
 		if( shader_ != NULL )
@@ -82,6 +80,7 @@ namespace D3D
 		CheckResult( device->SetVertexShaderConstantF(startRegister, data, count) );
 
 	}
+
 	VertexBuffer::VertexBuffer(GraphicDevice& device, UINT length)
 		:Base(device), vertexBuffer_(NULL)
 	{
@@ -89,6 +88,7 @@ namespace D3D
 							  0, 0,
 							  D3DPOOL_DEFAULT, &vertexBuffer_, NULL ));
 	}
+
 	VertexBuffer::~VertexBuffer()
 	{
 		if(vertexBuffer_ != NULL)
@@ -111,6 +111,7 @@ namespace D3D
 							  0, D3DFMT_INDEX32,
 							  D3DPOOL_DEFAULT, &indexBuffer_, NULL ));
 	}
+
 	IndexBuffer::~IndexBuffer()
 	{
 		if(indexBuffer_ != NULL)
@@ -131,6 +132,7 @@ namespace D3D
 	{
 		CheckResult( device->CreateVertexDeclaration(vertexDeclaration, &vertexDeclaration_) );
 	}
+
 	VertexDeclaration::~VertexDeclaration()
 	{
 		if(vertexDeclaration_ != NULL)

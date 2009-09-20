@@ -55,6 +55,12 @@ namespace D3D
 		{
 			CheckResult( device_->SetRenderState(state, value) );
 		}
+		void DrawIndexedPrimitive( D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minIndex, 
+									UINT numVertices, UINT startIndex, UINT primitiveCount )
+		{
+			CheckResult(device_->DrawIndexedPrimitive(type, baseVertexIndex, minIndex,
+						numVertices, startIndex, primitiveCount));
+		}
 	private:
 		IDirect3D9* directX_;
 		IDirect3DDevice9* device_;

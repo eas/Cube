@@ -104,16 +104,14 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vertexBuffer, 
 			D3D::IndexBuffer& indexBuffer, D3D::Shader& shader, D3D::VertexDeclaration& vertexDeclaration)
 {
-	using D3D::CheckResult;
-
-	D3D::GraphicDevice::Scene( device, D3DCLEAR_TARGET, Gray, 1.0f, 0 );
+	D3D::GraphicDevice::Scene scene( device, D3DCLEAR_TARGET, Gray, 1.0f, 0 );
 
 	vertexBuffer.Use(0, 0);
 	indexBuffer.Use();
 	shader.Use();
 	vertexDeclaration.Use();
 
-	CheckResult( device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, verticesCount, 0, indicesCount/3 ) );
+	device.DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, verticesCount, 0, indicesCount/3 );
 }
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
