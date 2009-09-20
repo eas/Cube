@@ -83,6 +83,15 @@ UINT testIndicesCount = SIZE(testIndices);
 	UINT verticesCount = cubeVerticesCount;
 #endif
 
+
+float worldMatrix[] =
+{
+	1.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 1.0f,
+};
+
 // Global Variables:
 TCHAR szTitle[maxLoadString];					// The title bar text
 TCHAR szWindowClass[maxLoadString];			// the main window class name
@@ -93,17 +102,18 @@ HWND				CreateMainWindow(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vertexBuffer, 
-			D3D::IndexBuffer& indexBuffer, D3D::Shader& shader)
+			D3D::IndexBuffer& indexBuffer, D3D::Shader& shader, D3D::VertexDeclaration& vertexDeclaration)
 {
 	using D3D::CheckResult;
 
 	CheckResult( device->Clear( 0, NULL, D3DCLEAR_TARGET/*|D3DCLEAR_ZBUFFER*/, Gray, 1.0f, 0 ) );
 	CheckResult( device->BeginScene());
 
-	CheckResult( device->SetStreamSource( 0, vertexBuffer.GetBuffer(), 0, sizeof( D3D::Vertex ) ) );
-	CheckResult( device->SetIndices(indexBuffer.GetBuffer()) );
-	
-	CheckResult( device->SetVertexShader(shader.GetShader()) );
+	vertexBuffer.Use(0, 0);
+	indexBuffer.Use();
+	shader.Use();
+	vertexDeclaration.Use();
+
 	CheckResult( device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, verticesCount, 0, indicesCount/3 ) );
 
 	CheckResult( device->EndScene() );
@@ -139,31 +149,33 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 
 	D3D::GraphicDevice graphicDevice( mainWindow, params );
-	graphicDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	//graphicDevice->SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
-	//graphicDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
+	graphicDevice.SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	graphicDevice.SetRenderState( D3DRS_LIGHTING, FALSE );
+
+	//graphicDevice.SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
+	//graphicDevice.SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
 
 	D3DVERTEXELEMENT9 vd[] = 
 	{
-		{0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITIONT, 0},
 		{0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
 		D3DDECL_END()
 
 	};
 
 	D3D::VertexDeclaration vertexDeclaration(graphicDevice, vd);
-	D3D::CheckResult( graphicDevice->SetVertexDeclaration(vertexDeclaration.GetDeclaration()) );
+	vertexDeclaration.Use();
 
-	D3D::Shader shader(graphicDevice, L"shader.vsh");
-	D3D::CheckResult( graphicDevice->SetVertexShader(shader.GetShader()) );
-
+	D3D::Shader shader(graphicDevice, L"shader2.vsh");
+	shader.Use();
+	shader.SetupConstantF( graphicDevice, 0, worldMatrix, 4 );
 	//D3D::CheckResult( graphicDevice->SetFVF(D3DFVF_CUSTOMVERTEX) );
 
 	D3D::VertexBuffer vertexBuffer(graphicDevice, sizeof(D3D::Vertex)*verticesCount);
-	vertexBuffer.Set(vertices, sizeof(D3D::Vertex)*verticesCount);
+	vertexBuffer.SetVertices(vertices, sizeof(D3D::Vertex)*verticesCount);
 
 	D3D::IndexBuffer indexBuffer(graphicDevice, sizeof(UINT)*indicesCount);
-	indexBuffer.Set(indices, sizeof(UINT)*indicesCount);
+	indexBuffer.SetIndices(indices, sizeof(UINT)*indicesCount);
 
 	MSG msg;
 	HACCEL hAccelTable;
@@ -178,7 +190,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
             DispatchMessage( &msg );
         }
         else
-            Render(graphicDevice, vertexBuffer, indexBuffer, shader);
+            Render(graphicDevice, vertexBuffer, indexBuffer, shader, vertexDeclaration);
     }
 	return (int) msg.wParam;
 }

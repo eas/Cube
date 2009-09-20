@@ -36,8 +36,9 @@ namespace D3D
 	class GraphicDevice
 	{
 	public:
-		GraphicDevice( HWND hWnd );
 		GraphicDevice( HWND hWnd, D3DPRESENT_PARAMETERS& params );
+		GraphicDevice( const GraphicDevice& other );
+
 		~GraphicDevice();
 		IDirect3DDevice9* GetDevice()
 		{
@@ -47,19 +48,43 @@ namespace D3D
 		{
 			return device_;
 		}
+		void SetRenderState(D3DRENDERSTATETYPE state, DWORD value)
+		{
+			CheckResult( device_->SetRenderState(state, value) );
+		}
 	private:
 		IDirect3D9* directX_;
 		IDirect3DDevice9* device_;
 	};
 
-	class Shader
+	class Base
 	{
 	public:
-		//Shader(GraphicDevice& device);
-		Shader::Shader(GraphicDevice& device, LPCTSTR fileName);
+		Base(GraphicDevice& device)
+			:device_(device)
+		{
+		}
+	protected:
+		GraphicDevice device_;
+	private:
+		Base();
+		Base(const Base& other);
+		Base& operator=(const Base& other);
+	};
+
+	class Shader
+		:public Base
+	{
+	public:
+		Shader(GraphicDevice& device, LPCTSTR fileName);
 		IDirect3DVertexShader9* GetShader()
 		{
 			return shader_;
+		}
+		void SetupConstantF( GraphicDevice& device, UINT startRegister, const float* data, UINT count);
+		void Use()
+		{
+			CheckResult( device_->SetVertexShader(shader_) );
 		}
 		~Shader();
 	private:
@@ -67,11 +92,12 @@ namespace D3D
 	};
 
 	class VertexBuffer
+		:public Base
 	{
 	public:
 		VertexBuffer(GraphicDevice& device, UINT length);
 		~VertexBuffer();
-		void Set(Vertex vertices[], UINT sizeToLock);
+		void SetVertices(Vertex vertices[], UINT sizeToLock);
 		inline IDirect3DVertexBuffer9* GetBuffer()
 		{
 			return vertexBuffer_;
@@ -80,16 +106,21 @@ namespace D3D
 		{
 			return vertexBuffer_;
 		}
+		void Use(UINT streamNumber, UINT offsetInBytes)
+		{
+			CheckResult( device_->SetStreamSource(streamNumber, vertexBuffer_, offsetInBytes, sizeof(Vertex)) );
+		}
 	private:
 		IDirect3DVertexBuffer9* vertexBuffer_;
 	};
 
 	class IndexBuffer
+		:public Base
 	{
 	public:
 		IndexBuffer(GraphicDevice& device, UINT length);
 		~IndexBuffer();
-		void Set(UINT indices[], UINT sizeToLock);
+		void SetIndices(UINT indices[], UINT sizeToLock);
 		inline IDirect3DIndexBuffer9* GetBuffer()
 		{
 			return indexBuffer_;
@@ -98,11 +129,16 @@ namespace D3D
 		{
 			return indexBuffer_;
 		}
+		void Use()
+		{
+			CheckResult( device_->SetIndices(indexBuffer_) );
+		}
 	private:
 		IDirect3DIndexBuffer9* indexBuffer_;
 	};
 
 	class VertexDeclaration
+		:public Base
 	{
 	public:
 		VertexDeclaration(GraphicDevice& device, D3DVERTEXELEMENT9 vertexDeclaration[]);
@@ -110,6 +146,10 @@ namespace D3D
 		IDirect3DVertexDeclaration9* GetDeclaration()
 		{
 			return vertexDeclaration_;
+		}
+		void Use()
+		{
+			CheckResult( device_->SetVertexDeclaration(vertexDeclaration_) );
 		}
 	private:
 		IDirect3DVertexDeclaration9* vertexDeclaration_;
