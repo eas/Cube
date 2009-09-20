@@ -106,8 +106,7 @@ void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vertexBuffer,
 {
 	using D3D::CheckResult;
 
-	CheckResult( device->Clear( 0, NULL, D3DCLEAR_TARGET/*|D3DCLEAR_ZBUFFER*/, Gray, 1.0f, 0 ) );
-	CheckResult( device->BeginScene());
+	D3D::GraphicDevice::Scene( device, D3DCLEAR_TARGET, Gray, 1.0f, 0 );
 
 	vertexBuffer.Use(0, 0);
 	indexBuffer.Use();
@@ -115,9 +114,6 @@ void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vertexBuffer,
 	vertexDeclaration.Use();
 
 	CheckResult( device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, verticesCount, 0, indicesCount/3 ) );
-
-	CheckResult( device->EndScene() );
-	CheckResult( device->Present( NULL, NULL, NULL, NULL ) );
 }
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
@@ -155,18 +151,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	//graphicDevice.SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
 	//graphicDevice.SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
 
-	D3DVERTEXELEMENT9 vd[] = 
-	{
-		{0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITIONT, 0},
-		{0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
-		D3DDECL_END()
-
-	};
-
-	D3D::VertexDeclaration vertexDeclaration(graphicDevice, vd);
+	D3D::VertexDeclaration vertexDeclaration(graphicDevice, D3D::vertexDeclaration);
 	vertexDeclaration.Use();
 
-	D3D::Shader shader(graphicDevice, L"shader2.vsh");
+	D3D::Shader shader(graphicDevice, L"shader.vsh");
 	shader.Use();
 	shader.SetupConstantF( graphicDevice, 0, worldMatrix, 4 );
 	//D3D::CheckResult( graphicDevice->SetFVF(D3DFVF_CUSTOMVERTEX) );
@@ -178,8 +166,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	indexBuffer.SetIndices(indices, sizeof(UINT)*indicesCount);
 
 	MSG msg;
-	HACCEL hAccelTable;
-	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LESSON1));
 	
 	ZeroMemory(&msg, sizeof(msg));
     while( msg.message != WM_QUIT )

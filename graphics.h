@@ -4,10 +4,6 @@
 #include "d3d9.h"
 #include "exception"
 
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE)
-
-
-
 
 namespace D3D
 {
@@ -26,6 +22,12 @@ namespace D3D
 		float x, y, z, rhw;
 		DWORD color;
 	};
+	static D3DVERTEXELEMENT9 vertexDeclaration[] = 
+	{
+		{0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITIONT, 0},
+		{0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+		D3DDECL_END()
+	};
 
 	inline void CheckResult(HRESULT errorCode)
 	{
@@ -36,6 +38,7 @@ namespace D3D
 	class GraphicDevice
 	{
 	public:
+		class Scene;
 		GraphicDevice( HWND hWnd, D3DPRESENT_PARAMETERS& params );
 		GraphicDevice( const GraphicDevice& other );
 
@@ -70,6 +73,28 @@ namespace D3D
 		Base();
 		Base(const Base& other);
 		Base& operator=(const Base& other);
+	};
+	class GraphicDevice::Scene
+		:public Base
+	{
+	public:
+		Scene(GraphicDevice& device,
+				DWORD flags, D3DCOLOR color, float z, DWORD stencil,
+				DWORD count = NULL, const D3DRECT* rects = NULL )
+				:Base(device)
+		{
+			//assert( (count == NULL && rects == NULL) || (count != NULL && rects != NULL) );
+			CheckResult( device->Clear( count, rects, flags, color, z, stencil ) );
+			CheckResult( device->BeginScene() );
+		}
+		~Scene()
+		{
+			CheckResult( device_->EndScene() );
+			CheckResult( device_->Present( NULL, NULL, NULL, NULL ) );
+		}
+	private:
+		Scene(const Scene&);
+		Scene& operator=(const Scene&);
 	};
 
 	class Shader

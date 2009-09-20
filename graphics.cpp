@@ -64,7 +64,7 @@ namespace D3D
 	{
 		ID3DXBuffer* shaderCode = NULL;
 
-		CheckResult( D3DXAssembleShaderFromFile(fileName, NULL, NULL, D3DXSHADER_DEBUG, &shaderCode, NULL) );
+		CheckResult( D3DXAssembleShaderFromFile(fileName, NULL, NULL, NULL, &shaderCode, NULL) );
 		DWORD* buf = static_cast<DWORD*>(shaderCode->GetBufferPointer());
 		buf;
 		CheckResult( device->CreateVertexShader(static_cast<DWORD*>(shaderCode->GetBufferPointer()), &shader_) );
@@ -86,7 +86,7 @@ namespace D3D
 		:Base(device), vertexBuffer_(NULL)
 	{
 		CheckResult(device->CreateVertexBuffer( length,
-							  0, D3DFVF_CUSTOMVERTEX,
+							  0, 0,
 							  D3DPOOL_DEFAULT, &vertexBuffer_, NULL ));
 	}
 	VertexBuffer::~VertexBuffer()
