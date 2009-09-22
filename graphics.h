@@ -19,13 +19,13 @@ namespace D3D
 
 	struct Vertex
 	{
-		float x, y, z, rhw;
+		float x, y, z;
 		DWORD color;
 	};
 	static D3DVERTEXELEMENT9 vertexDeclaration[] = 
 	{
-		{0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITIONT, 0},
-		{0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
 		D3DDECL_END()
 	};
 
@@ -38,7 +38,7 @@ namespace D3D
 	class GraphicDevice
 	{
 	public:
-		class Scene;
+		class DC;
 		GraphicDevice( HWND hWnd, D3DPRESENT_PARAMETERS& params );
 		GraphicDevice( const GraphicDevice& other );
 
@@ -66,45 +66,32 @@ namespace D3D
 		IDirect3DDevice9* device_;
 	};
 
-	class Base
+
+	class GraphicDevice::DC
 	{
 	public:
-		Base(GraphicDevice& device)
-			:device_(device)
-		{
-		}
-	protected:
-		GraphicDevice device_;
-	private:
-		Base();
-		Base(const Base& other);
-		Base& operator=(const Base& other);
-	};
-	class GraphicDevice::Scene
-		:public Base
-	{
-	public:
-		Scene(GraphicDevice& device,
+		DC(GraphicDevice& device,
 				DWORD flags, D3DCOLOR color, float z, DWORD stencil,
 				DWORD count = NULL, const D3DRECT* rects = NULL )
-				:Base(device)
+				:device_(device)
 		{
 			//assert( (count == NULL && rects == NULL) || (count != NULL && rects != NULL) );
 			CheckResult( device->Clear( count, rects, flags, color, z, stencil ) );
 			CheckResult( device->BeginScene() );
 		}
-		~Scene()
+		~DC()
 		{
 			CheckResult( device_->EndScene() );
 			CheckResult( device_->Present( NULL, NULL, NULL, NULL ) );
 		}
 	private:
-		Scene(const Scene&);
-		Scene& operator=(const Scene&);
+		DC(const DC&);
+		DC& operator=(const DC&);
+
+		GraphicDevice device_;
 	};
 
 	class Shader
-		:public Base
 	{
 	public:
 		Shader(GraphicDevice& device, LPCTSTR fileName);
@@ -119,11 +106,14 @@ namespace D3D
 		}
 		~Shader();
 	private:
+		Shader(const Shader&);
+		Shader& operator=(const Shader&);
+
 		IDirect3DVertexShader9* shader_;
+		GraphicDevice device_;
 	};
 
 	class VertexBuffer
-		:public Base
 	{
 	public:
 		VertexBuffer(GraphicDevice& device, UINT length);
@@ -142,11 +132,14 @@ namespace D3D
 			CheckResult( device_->SetStreamSource(streamNumber, vertexBuffer_, offsetInBytes, sizeof(Vertex)) );
 		}
 	private:
+		VertexBuffer(const VertexBuffer&);
+		VertexBuffer& operator=(const VertexBuffer&);
+
 		IDirect3DVertexBuffer9* vertexBuffer_;
+		GraphicDevice device_;
 	};
 
 	class IndexBuffer
-		:public Base
 	{
 	public:
 		IndexBuffer(GraphicDevice& device, UINT length);
@@ -165,11 +158,14 @@ namespace D3D
 			CheckResult( device_->SetIndices(indexBuffer_) );
 		}
 	private:
+		IndexBuffer(const IndexBuffer&);
+		IndexBuffer& operator=(const IndexBuffer&);
+
 		IDirect3DIndexBuffer9* indexBuffer_;
+		GraphicDevice device_;
 	};
 
 	class VertexDeclaration
-		:public Base
 	{
 	public:
 		VertexDeclaration(GraphicDevice& device, D3DVERTEXELEMENT9 vertexDeclaration[]);
@@ -183,6 +179,11 @@ namespace D3D
 			CheckResult( device_->SetVertexDeclaration(vertexDeclaration_) );
 		}
 	private:
+		VertexDeclaration(const VertexDeclaration&);
+		VertexDeclaration& operator=(const VertexDeclaration&);
+
 		IDirect3DVertexDeclaration9* vertexDeclaration_;
+		GraphicDevice device_;
 	};
+
 } // namespace D3D

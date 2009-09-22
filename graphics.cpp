@@ -34,7 +34,7 @@ namespace D3D
 		if( NULL == ( directX_ = Direct3DCreate9( D3D_SDK_VERSION ) ) )
 			throw Error(E_FAIL);
 		CheckResult( directX_->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-										  D3DCREATE_HARDWARE_VERTEXPROCESSING,
+										  D3DCREATE_SOFTWARE_VERTEXPROCESSING,
 										  &params, &device_ ) );
 	}
 
@@ -57,11 +57,11 @@ namespace D3D
 	}
 
 	Shader::Shader(GraphicDevice& device, LPCTSTR fileName)
-		:Base(device), shader_(NULL)
+		:device_(device), shader_(NULL)
 	{
 		ID3DXBuffer* shaderCode = NULL;
 
-		CheckResult( D3DXAssembleShaderFromFile(fileName, NULL, NULL, NULL, &shaderCode, NULL) );
+		CheckResult( D3DXAssembleShaderFromFile(fileName, NULL, NULL, D3DXSHADER_DEBUG, &shaderCode, NULL) );
 		DWORD* buf = static_cast<DWORD*>(shaderCode->GetBufferPointer());
 		buf;
 		CheckResult( device->CreateVertexShader(static_cast<DWORD*>(shaderCode->GetBufferPointer()), &shader_) );
@@ -82,7 +82,7 @@ namespace D3D
 	}
 
 	VertexBuffer::VertexBuffer(GraphicDevice& device, UINT length)
-		:Base(device), vertexBuffer_(NULL)
+		:device_(device), vertexBuffer_(NULL)
 	{
 		CheckResult(device->CreateVertexBuffer( length,
 							  0, 0,
@@ -105,7 +105,7 @@ namespace D3D
 	}
 
 	IndexBuffer::IndexBuffer(GraphicDevice& device, UINT length)
-		:Base(device), indexBuffer_(NULL)
+		:device_(device), indexBuffer_(NULL)
 	{
 		CheckResult(device->CreateIndexBuffer( length,
 							  0, D3DFMT_INDEX32,
@@ -128,7 +128,7 @@ namespace D3D
 	}
 
 	VertexDeclaration::VertexDeclaration(GraphicDevice& device, D3DVERTEXELEMENT9 vertexDeclaration[])
-		:Base(device), vertexDeclaration_(NULL)
+		:device_(device), vertexDeclaration_(NULL)
 	{
 		CheckResult( device->CreateVertexDeclaration(vertexDeclaration, &vertexDeclaration_) );
 	}

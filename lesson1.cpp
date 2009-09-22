@@ -28,15 +28,15 @@ COLOR_DEFINE( Gray,		128, 128, 128 )
 
 D3D::Vertex cubeVertices[] =
 {
-	{ 100.0f, 200.0f, 10.0f, 1.0f, Red },
-	{ 100.0f, 100.0f, 10.0f, 1.0f, Magenta },
-	{ 200.0f, 100.0f, 10.0f, 1.0f, White },
-	{ 200.0f, 200.0f, 10.0f, 1.0f, Yellow },
+	{ 100.0f, 200.0f, 10.0f, Red },
+	{ 100.0f, 100.0f, 10.0f, Magenta },
+	{ 200.0f, 100.0f, 10.0f, White },
+	{ 200.0f, 200.0f, 10.0f, Yellow },
 
-	{ 100.0f, 200.0f, 110.0f, 1.0f, Black },
-	{ 100.0f, 100.0f, 110.0f, 1.0f, Blue },
-	{ 200.0f, 100.0f, 110.0f, 1.0f, Cyan },
-	{ 200.0f, 200.0f, 110.0f, 1.0f, Green },
+	{ 100.0f, 200.0f, 110.0f, Black },
+	{ 100.0f, 100.0f, 110.0f, Blue },
+	{ 200.0f, 100.0f, 110.0f, Cyan },
+	{ 200.0f, 200.0f, 110.0f, Green },
 };
 UINT cubeVerticesCount = SIZE(cubeVertices);
 
@@ -51,15 +51,16 @@ UINT cubeIndices[] =
 };
 UINT cubeIndicesCount = SIZE(cubeIndices);
 
+const float C = 0.45f;
 D3D::Vertex testVertices[] =
 {
-	{ 100.0f, 100.0f, 0.20f, 1.0f, Red },
-	{ 200.0f, 150.0f, 0.30f, 1.0f, Red },
-	{ 100.0f, 200.0f, 0.20f, 1.0f, Red },
+	{ C*1.0f, C*1.0f, 0.20f, Red },
+	{ C*2.0f, C*1.5f, 0.30f, Red },
+	{ C*1.0f, C*2.0f, 0.20f, Red },
 
-	{ 200.0f, 200.0f, 0.20f, 1.0f, Blue },
-	{ 100.0f, 150.0f, 0.30f, 1.0f, Blue },
-	{ 200.0f, 100.0f, 0.20f, 1.0f, Blue },
+	{ C*2.0f, C*2.0f, 0.20f, Blue },
+	{ C*1.0f, C*1.5f, 0.30f, Blue },
+	{ C*2.0f, C*1.0f, 0.20f, Blue },
 };
 UINT testVerticesCount = SIZE(testVertices);
 
@@ -86,10 +87,10 @@ UINT testIndicesCount = SIZE(testIndices);
 
 float worldMatrix[] =
 {
-	1.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 1.0f,
+	 1.0f,  0.0f,  0.0f,  0.0f,
+	 0.0f,  1.0f,  0.0f,  0.0f,
+	 0.0f,  0.0f,  1.0f,  0.0f,
+	 0.0f,  0.0f,  0.0f,  1.0f,
 };
 
 // Global Variables:
@@ -104,7 +105,7 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vertexBuffer, 
 			D3D::IndexBuffer& indexBuffer, D3D::Shader& shader, D3D::VertexDeclaration& vertexDeclaration)
 {
-	D3D::GraphicDevice::Scene scene( device, D3DCLEAR_TARGET, Gray, 1.0f, 0 );
+	D3D::GraphicDevice::DC dc( device, D3DCLEAR_TARGET, Gray, 1.0f, 0 );
 
 	vertexBuffer.Use(0, 0);
 	indexBuffer.Use();
@@ -122,7 +123,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
  	// TODO: Place code here.
 
-
 	// Initialize global strings
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, maxLoadString);
 	LoadString(hInstance, IDC_LESSON1, szWindowClass, maxLoadString);
@@ -137,8 +137,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		params.Windowed = TRUE;
 		params.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		params.BackBufferFormat = D3DFMT_UNKNOWN;
-		//params.EnableAutoDepthStencil = TRUE;
-		//params.AutoDepthStencilFormat = D3DFMT_D16;
+		params.EnableAutoDepthStencil = TRUE;
+		params.AutoDepthStencilFormat = D3DFMT_D16;
 		//params.MultiSampleType = D3DMULTISAMPLE_NONE;
 
 
@@ -146,8 +146,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	graphicDevice.SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 	graphicDevice.SetRenderState( D3DRS_LIGHTING, FALSE );
 
-	//graphicDevice.SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
-	//graphicDevice.SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
+	graphicDevice.SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
+	graphicDevice.SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
 
 	D3D::VertexDeclaration vertexDeclaration(graphicDevice, D3D::vertexDeclaration);
 	vertexDeclaration.Use();
