@@ -45,8 +45,8 @@ public:
 	static const float thetaMax;
 	static const float rMin;
 };
-const float SpectatorCoords::deltaFi = D3DX_PI / 64;
-const float SpectatorCoords::deltaTheta = D3DX_PI / 64;
+const float SpectatorCoords::deltaFi = D3DX_PI / 8;
+const float SpectatorCoords::deltaTheta = D3DX_PI / 8;
 const float SpectatorCoords::deltaR = 10.0f;
 const float SpectatorCoords::thetaMin = 1e-12f;
 const float SpectatorCoords::thetaMax = D3DX_PI - thetaMin;
@@ -124,7 +124,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 
 	D3D::GraphicDevice graphicDevice( mainWindow, params );
-	graphicDevice.SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	graphicDevice.SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 	graphicDevice.SetRenderState( D3DRS_LIGHTING, FALSE );
 
 	graphicDevice.SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
@@ -135,15 +135,19 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	D3D::Shader shader(graphicDevice, L"shader.vsh");
 	shader.Use();
+
+#define TEST
+#ifdef TEST
 	shader.SetWorldMatrix( TranslationMatrix( 0.0f, 0.0f, 0.0f )*
-		RotateXMatrix(0*D3DX_PI / 8)*RotateYMatrix(0*D3DX_PI / 8)*ScaleMatrix( 1/170.0f, 1/170.0f, 1/170.0f) );
-	shader.SetProjectiveMatrix( ProjectiveMatrix(0.5f, 100.0f) );
+		RotateXMatrix(2*D3DX_PI / 8)*RotateYMatrix(0*D3DX_PI / 8)*ScaleMatrix( 1/170.0f, 1/170.0f, 1/170.0f) );
+#else
+	shader.SetWorldMatrix( RotateXMatrix(0*D3DX_PI / 8)*RotateYMatrix(0*D3DX_PI / 8) );
+#endif
 	//shader.SetViewMatrix(ViewMatrix(D3DXVECTOR3(0.0f, 0.0f, -1.0f),
 	//								D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 	//								D3DXVECTOR3(0.0f, 1.0f, 0.0f)));
 
-	shader.SetProjectiveMatrix( ProjectiveMatrix(0.5f, 100.0f) );
-
+	shader.SetProjectiveMatrix( ProjectiveMatrix(0.5f, 10000.0f) );
 
 	D3D::VertexBuffer vertexBuffer(graphicDevice, sizeof(D3D::Vertex)*verticesCount);
 	vertexBuffer.SetVertices(vertices, sizeof(D3D::Vertex)*verticesCount);
@@ -152,8 +156,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	D3D::IndexBuffer indexBuffer(graphicDevice, sizeof(UINT)*indicesCount);
 	indexBuffer.SetIndices(indices, sizeof(UINT)*indicesCount);
 	indexBuffer.Use();
-
-	SpectatorCoords spectatorCoords( 1, D3DX_PI / 4, -D3DX_PI / 4 + 0*SpectatorCoords::deltaFi);
+#ifdef TEST
+	SpectatorCoords spectatorCoords( 1.0f, D3DX_PI / 2, -D3DX_PI / 2 + 2*SpectatorCoords::deltaFi);
+#else
+	SpectatorCoords spectatorCoords( 100.0f, D3DX_PI / 2, -D3DX_PI / 2 + 2*SpectatorCoords::deltaFi);
+#endif
 	shader.SetViewMatrix(ViewMatrix(	spectatorCoords.GetCartesianCoords(),
 										D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 										D3DXVECTOR3(0.0f, 1.0f, 0.0f) ));
@@ -263,9 +270,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			default:
 				return DefWindowProc(hWnd, message, wParam, lParam);
 			}
-			//pShader->SetViewMatrix(ViewMatrix(	pSpectatorCoords->GetCartesianCoords(),
-			//									D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-			//									D3DXVECTOR3(0.0f, 1.0f, 0.0f) ));
+			pShader->SetViewMatrix(ViewMatrix(	pSpectatorCoords->GetCartesianCoords(),
+												D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+												D3DXVECTOR3(0.0f, 1.0f, 0.0f) ));
 			break;
 		}
 	case WM_COMMAND:

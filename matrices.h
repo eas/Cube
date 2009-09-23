@@ -78,6 +78,7 @@ const D3DXMATRIX ViewMatrix( const D3DXVECTOR3& eye, const D3DXVECTOR3& at, cons
 	D3DXVECTOR3 d(	-D3DXVec3Dot(&eye, &a),
 					-D3DXVec3Dot(&eye, &b),
 					-D3DXVec3Dot(&eye, &c) );
+	c = c / 2.0f;
 
 	return D3DXMATRIX(	a.x,	a.y,	a.z,	d.x,
 						b.x,	b.y,	b.z,	d.y,
