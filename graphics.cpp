@@ -75,10 +75,25 @@ namespace D3D
 			shader_->Release();
 	}
 
-	void Shader::SetupConstantF( GraphicDevice& device, UINT startRegister, const float* data, UINT count)
+	void Shader::SetWorldMatrix( const D3DXMATRIX& worldMatrix )
 	{
-		CheckResult( device->SetVertexShaderConstantF(startRegister, data, count) );
+		worldMatrix_ = worldMatrix;
+		SetShaderMatrix();
+	}
+	void Shader::SetViewMatrix( const D3DXMATRIX& viewMatrix )
+	{
+		viewMatrix_ = viewMatrix;
+		SetShaderMatrix();
+	}
+	void Shader::SetProjectiveMatrix( const D3DXMATRIX& projectiveMatrix )
+	{
+		projectiveMatrix_ = projectiveMatrix;
+		SetShaderMatrix();
+	}
 
+	void Shader::SetShaderMatrix()
+	{
+		CheckResult( device_->SetVertexShaderConstantF( 0, projectiveMatrix_*viewMatrix_*worldMatrix_, 4 ) );
 	}
 
 	VertexBuffer::VertexBuffer(GraphicDevice& device, UINT length)
@@ -127,10 +142,10 @@ namespace D3D
 		CheckResult( indexBuffer_->Unlock() );
 	}
 
-	VertexDeclaration::VertexDeclaration(GraphicDevice& device, D3DVERTEXELEMENT9 vertexDeclaration[])
+	VertexDeclaration::VertexDeclaration(GraphicDevice& device)
 		:device_(device), vertexDeclaration_(NULL)
 	{
-		CheckResult( device->CreateVertexDeclaration(vertexDeclaration, &vertexDeclaration_) );
+		CheckResult( device->CreateVertexDeclaration(D3D::vertexDeclaration, &vertexDeclaration_) );
 	}
 
 	VertexDeclaration::~VertexDeclaration()

@@ -3,6 +3,7 @@
 #include "windows.h"
 #include "d3d9.h"
 #include "exception"
+#include <d3dx9.h>
 
 
 namespace D3D
@@ -99,7 +100,9 @@ namespace D3D
 		{
 			return shader_;
 		}
-		void SetupConstantF( GraphicDevice& device, UINT startRegister, const float* data, UINT count);
+		void SetWorldMatrix( const D3DXMATRIX& worldMatrix );
+		void SetProjectiveMatrix( const D3DXMATRIX& projectiveMatrix );
+		void SetViewMatrix( const D3DXMATRIX& viewMatrix );
 		void Use()
 		{
 			CheckResult( device_->SetVertexShader(shader_) );
@@ -108,9 +111,14 @@ namespace D3D
 	private:
 		Shader(const Shader&);
 		Shader& operator=(const Shader&);
+	public:
+		void SetShaderMatrix();
+	private:
+
 
 		IDirect3DVertexShader9* shader_;
 		GraphicDevice device_;
+		D3DXMATRIX worldMatrix_, viewMatrix_, projectiveMatrix_;
 	};
 
 	class VertexBuffer
@@ -168,7 +176,7 @@ namespace D3D
 	class VertexDeclaration
 	{
 	public:
-		VertexDeclaration(GraphicDevice& device, D3DVERTEXELEMENT9 vertexDeclaration[]);
+		VertexDeclaration(GraphicDevice& device);
 		~VertexDeclaration();
 		IDirect3DVertexDeclaration9* GetDeclaration()
 		{
