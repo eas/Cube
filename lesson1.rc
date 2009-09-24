@@ -36,20 +36,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDI_LESSON1             ICON                    "lesson1.ico"
 IDI_SMALL               ICON                    "small.ico"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDC_LESSON1 MENU 
-BEGIN
-    POPUP "&File"
-    BEGIN
-        MENUITEM "E&xit",                       IDM_EXIT
-    END
-END
-
-
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -88,8 +74,8 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_APP_TITLE           "lesson1"
-    IDC_LESSON1             "LESSON1"
+    IDS_APP_TITLE           "cube"
+    IDC_CUBE                "Cube"
 END
 
 #endif    // English (U.S.) resources

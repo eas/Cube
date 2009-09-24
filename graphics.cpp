@@ -61,7 +61,7 @@ namespace D3D
 	{
 		ID3DXBuffer* shaderCode = NULL;
 
-		CheckResult( D3DXAssembleShaderFromFile(fileName, NULL, NULL, D3DXSHADER_DEBUG, &shaderCode, NULL) );
+		CheckResult( D3DXAssembleShaderFromFile(fileName, NULL, NULL, NULL, &shaderCode, NULL) );
 		DWORD* buf = static_cast<DWORD*>(shaderCode->GetBufferPointer());
 		buf;
 		CheckResult( device->CreateVertexShader(static_cast<DWORD*>(shaderCode->GetBufferPointer()), &shader_) );
@@ -96,10 +96,10 @@ namespace D3D
 		CheckResult( device_->SetVertexShaderConstantF( 0, projectiveMatrix_*viewMatrix_*worldMatrix_, 4 ) );
 	}
 
-	VertexBuffer::VertexBuffer(GraphicDevice& device, UINT length)
+	VertexBuffer::VertexBuffer(GraphicDevice& device, UINT nVertices)
 		:device_(device), vertexBuffer_(NULL)
 	{
-		CheckResult(device->CreateVertexBuffer( length,
+		CheckResult(device->CreateVertexBuffer( nVertices*sizeof(Vertex),
 							  0, 0,
 							  D3DPOOL_DEFAULT, &vertexBuffer_, NULL ));
 	}
@@ -110,19 +110,19 @@ namespace D3D
 			vertexBuffer_->Release();
 	}
 
-	void VertexBuffer::SetVertices(Vertex vertices[], UINT sizeToLock)
+	void VertexBuffer::SetVertices(Vertex vertices[], UINT nVertices)
 	{
 		void* buffer = NULL;
 
-		CheckResult( vertexBuffer_->Lock(0, sizeToLock, &buffer, 0) );
-		memcpy( buffer, vertices, sizeToLock);
+		CheckResult( vertexBuffer_->Lock(0, nVertices*sizeof(Vertex), &buffer, 0) );
+		memcpy( buffer, vertices, nVertices*sizeof(Vertex));
 		CheckResult( vertexBuffer_->Unlock() );
 	}
 
-	IndexBuffer::IndexBuffer(GraphicDevice& device, UINT length)
+	IndexBuffer::IndexBuffer(GraphicDevice& device, UINT nIndices)
 		:device_(device), indexBuffer_(NULL)
 	{
-		CheckResult(device->CreateIndexBuffer( length,
+		CheckResult(device->CreateIndexBuffer( nIndices*sizeof(UINT),
 							  0, D3DFMT_INDEX32,
 							  D3DPOOL_DEFAULT, &indexBuffer_, NULL ));
 	}
@@ -133,12 +133,12 @@ namespace D3D
 			indexBuffer_->Release();
 	}
 
-	void IndexBuffer::SetIndices(UINT indices[], UINT sizeToLock)
+	void IndexBuffer::SetIndices(UINT indices[], UINT nIndices)
 	{
 		void* buffer = NULL;
 
-		CheckResult( indexBuffer_->Lock(0, sizeToLock, &buffer, 0) );
-		memcpy( buffer, indices, sizeToLock);
+		CheckResult( indexBuffer_->Lock(0, nIndices*sizeof(UINT), &buffer, 0) );
+		memcpy( buffer, indices, nIndices*sizeof(UINT));
 		CheckResult( indexBuffer_->Unlock() );
 	}
 

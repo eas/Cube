@@ -56,12 +56,6 @@ namespace D3D
 		{
 			CheckResult( device_->SetRenderState(state, value) );
 		}
-		void DrawIndexedPrimitive( D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minIndex, 
-									UINT numVertices, UINT startIndex, UINT primitiveCount )
-		{
-			CheckResult(device_->DrawIndexedPrimitive(type, baseVertexIndex, minIndex,
-						numVertices, startIndex, primitiveCount));
-		}
 	private:
 		IDirect3D9* directX_;
 		IDirect3DDevice9* device_;
@@ -84,6 +78,12 @@ namespace D3D
 		{
 			CheckResult( device_->EndScene() );
 			CheckResult( device_->Present( NULL, NULL, NULL, NULL ) );
+		}
+		void DrawIndexedPrimitive( D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minIndex, 
+									UINT numVertices, UINT startIndex, UINT primitiveCount )
+		{
+			CheckResult(device_->DrawIndexedPrimitive(type, baseVertexIndex, minIndex,
+						numVertices, startIndex, primitiveCount));
 		}
 	private:
 		DC(const DC&);
@@ -124,9 +124,9 @@ namespace D3D
 	class VertexBuffer
 	{
 	public:
-		VertexBuffer(GraphicDevice& device, UINT length);
+		VertexBuffer(GraphicDevice& device, UINT nVertices);
 		~VertexBuffer();
-		void SetVertices(Vertex vertices[], UINT sizeToLock);
+		void SetVertices(Vertex vertices[], UINT nVertices);
 		inline IDirect3DVertexBuffer9* GetBuffer()
 		{
 			return vertexBuffer_;
@@ -150,9 +150,9 @@ namespace D3D
 	class IndexBuffer
 	{
 	public:
-		IndexBuffer(GraphicDevice& device, UINT length);
+		IndexBuffer(GraphicDevice& device, UINT nIndices);
 		~IndexBuffer();
-		void SetIndices(UINT indices[], UINT sizeToLock);
+		void SetIndices(UINT indices[], UINT nIndices);
 		inline IDirect3DIndexBuffer9* GetBuffer()
 		{
 			return indexBuffer_;

@@ -6,10 +6,10 @@
 #define IDD_LESSON1_DIALOG              102
 #define IDS_APP_TITLE                   103
 #define IDM_ABOUT                       104
-#define IDM_EXIT                        105
 #define IDI_LESSON1                     107
 #define IDI_SMALL                       108
 #define IDC_LESSON1                     109
+#define IDC_CUBE                        109
 #define IDR_MAINFRAME                   128
 #define IDC_STATIC                      -1
 

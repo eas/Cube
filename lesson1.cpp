@@ -26,12 +26,12 @@ public:
 							r_*cosf(theta_),
 							r_*sinf(theta_)*sinf(fi_) );
 	}
-	void IncTheta() { if(theta_+=deltaTheta > thetaMax) theta_= thetaMax; }
-	void DecTheta() { if(theta_-=deltaTheta < thetaMin) theta_= thetaMin; }
+	void IncTheta() { if((theta_+=deltaTheta) > thetaMax) theta_= thetaMax; }
+	void DecTheta() { if((theta_-=deltaTheta) < thetaMin) theta_= thetaMin; }
 	void IncFi() { fi_ += deltaFi; }
 	void DecFi() { fi_ -= deltaFi; }
 	void IncR() { r_ += deltaR; }
-	void DecR() { if(r_-=deltaR < rMin) r_ = rMin; }
+	void DecR() { if((r_-=deltaR) < rMin) r_ = rMin; }
 
 
 private:
@@ -45,12 +45,12 @@ public:
 	static const float thetaMax;
 	static const float rMin;
 };
-const float SpectatorCoords::deltaFi = D3DX_PI / 8;
-const float SpectatorCoords::deltaTheta = D3DX_PI / 8;
+const float SpectatorCoords::deltaFi = D3DX_PI / 24;
+const float SpectatorCoords::deltaTheta = D3DX_PI / 24;
 const float SpectatorCoords::deltaR = 10.0f;
-const float SpectatorCoords::thetaMin = 1e-12f;
+const float SpectatorCoords::thetaMin = 1e-3f;
 const float SpectatorCoords::thetaMax = D3DX_PI - thetaMin;
-const float SpectatorCoords::rMin = 0.0f;
+const float SpectatorCoords::rMin = 0.1f;
 
 const int maxLoadString = 100;
 const int WindowHeight = 500;
@@ -69,31 +69,17 @@ UINT verticesCount = cubeVerticesCount;
 
 // Global Variables:
 TCHAR szTitle[maxLoadString];					// The title bar text
-TCHAR szWindowClass[maxLoadString];			// the main window class name
+TCHAR szWindowClass[maxLoadString];				// the main window class name
 
 // Forward declarations of functions included in this code module:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 HWND				CreateMainWindow(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
-void Render(D3D::GraphicDevice& device, D3D::VertexBuffer& vb, 
-			D3D::IndexBuffer& ib, D3D::Shader& shader, D3D::VertexDeclaration& vd, SpectatorCoords& spCoords)
+void Render(D3D::GraphicDevice& device)
 {
-	//shader.SetShaderMatrix();
-	//static int i=1;
-	//if( ++i % 100 == 0 )
-	//{
-	//	spCoords.IncFi();
-	//	shader.SetViewMatrix(ViewMatrix( spCoords.GetCartesianCoords(),
-	//									 D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-	//									 D3DXVECTOR3(0.0f, 1.0f, 0.0f) ));
-	//	//shader.Use();
-	//	//vb.Use(0,0);
-	//	//ib.Use();
-	//	//vd.Use();
-	//}
-	D3D::GraphicDevice::DC dc( device, D3DCLEAR_TARGET, Gray, 1.0f, 0 );
-	device.DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, verticesCount, 0, indicesCount/3 );
+	D3D::GraphicDevice::DC dc( device, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, Gray, 1.0f, 0 );
+	dc.DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, verticesCount, 0, indicesCount/3 );
 }
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
@@ -106,7 +92,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	// Initialize global strings
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, maxLoadString);
-	LoadString(hInstance, IDC_LESSON1, szWindowClass, maxLoadString);
+	LoadString(hInstance, IDC_CUBE, szWindowClass, maxLoadString);
 	MyRegisterClass(hInstance);
 
 	// Perform application initialization:
@@ -120,7 +106,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		params.BackBufferFormat = D3DFMT_UNKNOWN;
 		params.EnableAutoDepthStencil = TRUE;
 		params.AutoDepthStencilFormat = D3DFMT_D16;
-		//params.MultiSampleType = D3DMULTISAMPLE_NONE;
+		params.MultiSampleType = D3DMULTISAMPLE_NONE;
 
 
 	D3D::GraphicDevice graphicDevice( mainWindow, params );
@@ -136,31 +122,18 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	D3D::Shader shader(graphicDevice, L"shader.vsh");
 	shader.Use();
 
-#define TEST
-#ifdef TEST
-	shader.SetWorldMatrix( TranslationMatrix( 0.0f, 0.0f, 0.0f )*
-		RotateXMatrix(2*D3DX_PI / 8)*RotateYMatrix(0*D3DX_PI / 8)*ScaleMatrix( 1/170.0f, 1/170.0f, 1/170.0f) );
-#else
-	shader.SetWorldMatrix( RotateXMatrix(0*D3DX_PI / 8)*RotateYMatrix(0*D3DX_PI / 8) );
-#endif
-	//shader.SetViewMatrix(ViewMatrix(D3DXVECTOR3(0.0f, 0.0f, -1.0f),
-	//								D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-	//								D3DXVECTOR3(0.0f, 1.0f, 0.0f)));
-
-	shader.SetProjectiveMatrix( ProjectiveMatrix(0.5f, 10000.0f) );
-
-	D3D::VertexBuffer vertexBuffer(graphicDevice, sizeof(D3D::Vertex)*verticesCount);
-	vertexBuffer.SetVertices(vertices, sizeof(D3D::Vertex)*verticesCount);
+	D3D::VertexBuffer vertexBuffer(graphicDevice, verticesCount);
+	vertexBuffer.SetVertices(vertices, verticesCount);
 	vertexBuffer.Use(0,0);
 
-	D3D::IndexBuffer indexBuffer(graphicDevice, sizeof(UINT)*indicesCount);
-	indexBuffer.SetIndices(indices, sizeof(UINT)*indicesCount);
+	D3D::IndexBuffer indexBuffer(graphicDevice, indicesCount);
+	indexBuffer.SetIndices(indices, indicesCount);
 	indexBuffer.Use();
-#ifdef TEST
-	SpectatorCoords spectatorCoords( 1.0f, D3DX_PI / 2, -D3DX_PI / 2 + 2*SpectatorCoords::deltaFi);
-#else
-	SpectatorCoords spectatorCoords( 100.0f, D3DX_PI / 2, -D3DX_PI / 2 + 2*SpectatorCoords::deltaFi);
-#endif
+
+	SpectatorCoords spectatorCoords( 150.0f, D3DX_PI / 2, -D3DX_PI / 2 );
+
+	shader.SetWorldMatrix( UnityMatrix() );
+	shader.SetProjectiveMatrix( ProjectiveMatrix(0.5f, 1.0e+15f) );
 	shader.SetViewMatrix(ViewMatrix(	spectatorCoords.GetCartesianCoords(),
 										D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 										D3DXVECTOR3(0.0f, 1.0f, 0.0f) ));
@@ -168,7 +141,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	SetWindowLong(mainWindow, 0, reinterpret_cast<LONG>(&spectatorCoords));
 	SetWindowLong(mainWindow, sizeof(LONG), reinterpret_cast<LONG>(&shader));
-
 
 	MSG msg;
 	
@@ -181,7 +153,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
             DispatchMessage( &msg );
         }
         else
-            Render(graphicDevice, vertexBuffer, indexBuffer, shader, vertexDeclaration, spectatorCoords);
+            Render(graphicDevice);
     }
 	return (int) msg.wParam;
 }
@@ -242,8 +214,6 @@ HWND CreateMainWindow(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	int wmId, wmEvent;
-
 	switch (message)
 	{
 	case WM_KEYDOWN:
@@ -267,6 +237,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case VK_LEFT:
 				pSpectatorCoords->DecFi();
 				break;
+			case VK_NEXT:
+			case 'S':
+				pSpectatorCoords->IncR();
+				break;
+			case VK_PRIOR:
+			case 'W':
+				pSpectatorCoords->DecR();
+				break;
 			default:
 				return DefWindowProc(hWnd, message, wParam, lParam);
 			}
@@ -275,19 +253,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 												D3DXVECTOR3(0.0f, 1.0f, 0.0f) ));
 			break;
 		}
-	case WM_COMMAND:
-		wmId    = LOWORD(wParam);
-		wmEvent = HIWORD(wParam);
-		// Parse the menu selections:
-		switch (wmId)
-		{
-		case IDM_EXIT:
-			DestroyWindow(hWnd);
-			break;
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
