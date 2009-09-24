@@ -110,11 +110,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 
 	D3D::GraphicDevice graphicDevice( mainWindow, params );
-	graphicDevice.SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	graphicDevice.SetRenderState( D3DRS_LIGHTING, FALSE );
-
-	graphicDevice.SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );
-	graphicDevice.SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
 
 	D3D::VertexDeclaration vertexDeclaration(graphicDevice);
 	vertexDeclaration.Use();

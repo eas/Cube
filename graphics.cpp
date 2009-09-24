@@ -34,7 +34,7 @@ namespace D3D
 		if( NULL == ( directX_ = Direct3DCreate9( D3D_SDK_VERSION ) ) )
 			throw Error(E_FAIL);
 		CheckResult( directX_->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-										  D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+										  D3DCREATE_HARDWARE_VERTEXPROCESSING,
 										  &params, &device_ ) );
 	}
 
@@ -100,8 +100,8 @@ namespace D3D
 		:device_(device), vertexBuffer_(NULL)
 	{
 		CheckResult(device->CreateVertexBuffer( nVertices*sizeof(Vertex),
-							  0, 0,
-							  D3DPOOL_DEFAULT, &vertexBuffer_, NULL ));
+												D3DUSAGE_WRITEONLY, 0,
+												D3DPOOL_DEFAULT, &vertexBuffer_, NULL ));
 	}
 
 	VertexBuffer::~VertexBuffer()
@@ -122,9 +122,9 @@ namespace D3D
 	IndexBuffer::IndexBuffer(GraphicDevice& device, UINT nIndices)
 		:device_(device), indexBuffer_(NULL)
 	{
-		CheckResult(device->CreateIndexBuffer( nIndices*sizeof(UINT),
-							  0, D3DFMT_INDEX32,
-							  D3DPOOL_DEFAULT, &indexBuffer_, NULL ));
+		CheckResult(device->CreateIndexBuffer(	nIndices*sizeof(UINT),
+												D3DUSAGE_WRITEONLY, D3DFMT_INDEX32,
+												D3DPOOL_DEFAULT, &indexBuffer_, NULL ));
 	}
 
 	IndexBuffer::~IndexBuffer()
