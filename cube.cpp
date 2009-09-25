@@ -52,24 +52,25 @@ const float SpectatorCoords::thetaMin = 1e-3f;
 const float SpectatorCoords::thetaMax = D3DX_PI - thetaMin;
 const float SpectatorCoords::rMin = 0.1f;
 
-const int maxLoadString = 100;
+const int MaxLoadString = 100;
 const int WindowHeight = 500;
 const int WindowWidth = WindowHeight;
 const int WindowPostionX = 350;
 const int WindowPostionY = 120;
 
+const LPCTSTR ShaderFileName = L"shader.vsh";
 
 
-D3D::Vertex* vertices = cubeVertices;
-UINT* indices = cubeIndices;
-UINT indicesCount = cubeIndicesCount;
-UINT verticesCount = cubeVerticesCount;
+const D3D::Vertex* const vertices = cubeVertices;
+const UINT* const indices = cubeIndices;
+const UINT indicesCount = cubeIndicesCount;
+const UINT verticesCount = cubeVerticesCount;
 
 
 
 // Global Variables:
-TCHAR szTitle[maxLoadString];					// The title bar text
-TCHAR szWindowClass[maxLoadString];				// the main window class name
+TCHAR szTitle[MaxLoadString];					// The title bar text
+TCHAR szWindowClass[MaxLoadString];				// the main window class name
 
 // Forward declarations of functions included in this code module:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -87,12 +88,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      LPTSTR    ,
                      int       nCmdShow)
 {
-
  	// TODO: Place code here.
 
 	// Initialize global strings
-	LoadString(hInstance, IDS_APP_TITLE, szTitle, maxLoadString);
-	LoadString(hInstance, IDC_CUBE, szWindowClass, maxLoadString);
+	LoadString(hInstance, IDS_APP_TITLE, szTitle, MaxLoadString);
+	LoadString(hInstance, IDC_CUBE, szWindowClass, MaxLoadString);
 	MyRegisterClass(hInstance);
 
 	// Perform application initialization:
@@ -108,13 +108,16 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		params.AutoDepthStencilFormat = D3DFMT_D16;
 		params.MultiSampleType = D3DMULTISAMPLE_NONE;
 
-
+	//const float pointSize = 1.3098e-316f;
 	D3D::GraphicDevice graphicDevice( mainWindow, params );
+	//graphicDevice.SetRenderState(D3DRS_POINTSIZE_MAX, *((DWORD*)&pointSize));
+
+
 
 	D3D::VertexDeclaration vertexDeclaration(graphicDevice);
 	vertexDeclaration.Use();
 
-	D3D::Shader shader(graphicDevice, L"shader.vsh");
+	D3D::Shader shader(graphicDevice, ShaderFileName);
 	shader.Use();
 
 	D3D::VertexBuffer vertexBuffer(graphicDevice, verticesCount);

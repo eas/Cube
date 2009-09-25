@@ -3,7 +3,7 @@
 
 #define SIZE(Array) sizeof(Array)/sizeof(Array[0]);
 
-D3D::Vertex cubeVertices[] =
+const D3D::Vertex cubeVertices[] =
 {
 	{ -50.0f, -50.0f, -50.0f, Red },
 	{ -50.0f,  50.0f, -50.0f, Magenta },
@@ -15,9 +15,9 @@ D3D::Vertex cubeVertices[] =
 	{  50.0f,  50.0f,  50.0f, Cyan },
 	{  50.0f, -50.0f,  50.0f, Green },
 };
-UINT cubeVerticesCount = SIZE(cubeVertices);
+const UINT cubeVerticesCount = SIZE(cubeVertices);
 
-UINT cubeIndices[] =
+const UINT cubeIndices[] =
 {
 	3, 0, 1,	3, 1, 2, //front side
 	3, 7, 4,	3, 4, 0, //bottom side
@@ -26,5 +26,5 @@ UINT cubeIndices[] =
 	1, 0, 4,	1, 4, 5, //left side
 	3, 2, 6,	3, 6, 7, //right side
 };
-UINT cubeIndicesCount = SIZE(cubeIndices);
+const UINT cubeIndicesCount = SIZE(cubeIndices);
 #undef SIZE
