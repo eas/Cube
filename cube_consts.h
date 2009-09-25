@@ -5,15 +5,15 @@
 
 const D3D::Vertex cubeVertices[] =
 {
-	{ -50.0f, -50.0f, -50.0f, Red },
-	{ -50.0f,  50.0f, -50.0f, Magenta },
-	{  50.0f,  50.0f, -50.0f, White },
-	{  50.0f, -50.0f, -50.0f, Yellow },
+	D3D::Vertex( -50.0f, -50.0f, -50.0f, Red ),
+	D3D::Vertex( -50.0f,  50.0f, -50.0f, Magenta ),
+	D3D::Vertex(  50.0f,  50.0f, -50.0f, White ),
+	D3D::Vertex(  50.0f, -50.0f, -50.0f, Yellow ),
 
-	{ -50.0f, -50.0f,  50.0f, Black },
-	{ -50.0f,  50.0f,  50.0f, Blue },
-	{  50.0f,  50.0f,  50.0f, Cyan },
-	{  50.0f, -50.0f,  50.0f, Green },
+	D3D::Vertex( -50.0f, -50.0f,  50.0f, Black ),
+	D3D::Vertex( -50.0f,  50.0f,  50.0f, Blue ),
+	D3D::Vertex(  50.0f,  50.0f,  50.0f, Cyan ),
+	D3D::Vertex(  50.0f, -50.0f,  50.0f, Green ),
 };
 const UINT cubeVerticesCount = SIZE(cubeVertices);
 

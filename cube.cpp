@@ -52,11 +52,6 @@ const float SpectatorCoords::thetaMin = 1e-3f;
 const float SpectatorCoords::thetaMax = D3DX_PI - thetaMin;
 const float SpectatorCoords::rMin = 0.1f;
 
-const int MaxLoadString = 100;
-const int WindowHeight = 500;
-const int WindowWidth = WindowHeight;
-const int WindowPostionX = 350;
-const int WindowPostionY = 120;
 
 const LPCTSTR ShaderFileName = L"shader.vsh";
 
@@ -66,16 +61,10 @@ const UINT* const indices = cubeIndices;
 const UINT indicesCount = cubeIndicesCount;
 const UINT verticesCount = cubeVerticesCount;
 
+const float FrontClippingPlane = 0.5f;
+const float BackClippingPlane = 1.0e13f;
 
-
-// Global Variables:
-TCHAR szTitle[MaxLoadString];					// The title bar text
-TCHAR szWindowClass[MaxLoadString];				// the main window class name
-
-// Forward declarations of functions included in this code module:
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-HWND				CreateMainWindow(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void Render(D3D::GraphicDevice& device)
 {
@@ -90,13 +79,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 {
  	// TODO: Place code here.
 
-	// Initialize global strings
-	LoadString(hInstance, IDS_APP_TITLE, szTitle, MaxLoadString);
-	LoadString(hInstance, IDC_CUBE, szWindowClass, MaxLoadString);
-	MyRegisterClass(hInstance);
-
-	// Perform application initialization:
-	HWND mainWindow = CreateMainWindow(hInstance, nCmdShow);
+	Window mainWindow(hInstance, nCmdShow, &WndProc);
 
 	D3DPRESENT_PARAMETERS params;
 		ZeroMemory( &params, sizeof( params ) );
@@ -109,7 +92,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		params.MultiSampleType = D3DMULTISAMPLE_NONE;
 
 	//const float pointSize = 1.3098e-316f;
-	D3D::GraphicDevice graphicDevice( mainWindow, params );
+	D3D::GraphicDevice graphicDevice( mainWindow.GetHWND(), params );
 	//graphicDevice.SetRenderState(D3DRS_POINTSIZE_MAX, *((DWORD*)&pointSize));
 
 
@@ -131,14 +114,14 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	SpectatorCoords spectatorCoords( 150.0f, D3DX_PI / 2, -D3DX_PI / 2 );
 
 	shader.SetWorldMatrix( UnityMatrix() );
-	shader.SetProjectiveMatrix( ProjectiveMatrix(0.5f, 1.0e+15f) );
+	shader.SetProjectiveMatrix( ProjectiveMatrix(FrontClippingPlane, BackClippingPlane) );
 	shader.SetViewMatrix(ViewMatrix(	spectatorCoords.GetCartesianCoords(),
 										D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 										D3DXVECTOR3(0.0f, 1.0f, 0.0f) ));
 
 
-	SetWindowLong(mainWindow, 0, reinterpret_cast<LONG>(&spectatorCoords));
-	SetWindowLong(mainWindow, sizeof(LONG), reinterpret_cast<LONG>(&shader));
+	SetWindowLong(mainWindow.GetHWND(), 0, reinterpret_cast<LONG>(&spectatorCoords));
+	SetWindowLong(mainWindow.GetHWND(), sizeof(LONG), reinterpret_cast<LONG>(&shader));
 
 	MSG msg;
 	
@@ -155,60 +138,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     }
 	return (int) msg.wParam;
 }
-
-
-
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
-//  COMMENTS:
-//
-//    This function and its usage are only necessary if you want this code
-//    to be compatible with Win32 systems prior to the 'RegisterClassEx'
-//    function that was added to Windows 95. It is important to call this function
-//    so that the application will get 'well formed' small icons associated
-//    with it.
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
-
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= WndProc;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= sizeof(LONG) * 2;
-	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CUBE));
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= NULL;/*MAKEINTRESOURCE(IDC_CUBE);*/
-	wcex.lpszClassName	= szWindowClass;
-	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-
-	return RegisterClassEx(&wcex);
-}
-
-
-HWND CreateMainWindow(HINSTANCE hInstance, int nCmdShow)
-{
-   HWND hWnd;
-
-   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-	   WindowPostionX, WindowPostionY, WindowWidth, WindowHeight, NULL, NULL, hInstance, NULL);
-
-   if (!hWnd)
-	   throw WinApiError( GetLastError() );
-
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   return hWnd;
-}
-
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
