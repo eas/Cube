@@ -44,3 +44,10 @@ Window::Window(	HINSTANCE hInstance, int nCmdShow, WndProcType wndProc)
 Window::~Window()
 {
 }
+
+const float SpectatorCoords::deltaFi = D3DX_PI / 24;
+const float SpectatorCoords::deltaTheta = D3DX_PI / 24;
+const float SpectatorCoords::deltaR = 10.0f;
+const float SpectatorCoords::thetaMin = 1e-3f;
+const float SpectatorCoords::thetaMax = D3DX_PI - thetaMin;
+const float SpectatorCoords::rMin = 0.1f;

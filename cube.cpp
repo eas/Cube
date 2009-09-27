@@ -13,53 +13,15 @@
 
 #include "cube_consts.h"
 
-class SpectatorCoords
-{
-public:
-	SpectatorCoords(float r, float theta, float fi)
-		:r_(r), theta_(theta), fi_(fi)
-	{
-	}
-	const D3DXVECTOR3 GetCartesianCoords() const
-	{
-		return D3DXVECTOR3(	r_*sinf(theta_)*cosf(fi_),
-							r_*cosf(theta_),
-							r_*sinf(theta_)*sinf(fi_) );
-	}
-	void IncTheta() { if((theta_+=deltaTheta) > thetaMax) theta_= thetaMax; }
-	void DecTheta() { if((theta_-=deltaTheta) < thetaMin) theta_= thetaMin; }
-	void IncFi() { fi_ += deltaFi; }
-	void DecFi() { fi_ -= deltaFi; }
-	void IncR() { r_ += deltaR; }
-	void DecR() { if((r_-=deltaR) < rMin) r_ = rMin; }
-
-
-private:
-	float r_, theta_, fi_;
-
-public:
-	static const float deltaFi;
-	static const float deltaTheta;
-	static const float deltaR;
-	static const float thetaMin;
-	static const float thetaMax;
-	static const float rMin;
-};
-const float SpectatorCoords::deltaFi = D3DX_PI / 24;
-const float SpectatorCoords::deltaTheta = D3DX_PI / 24;
-const float SpectatorCoords::deltaR = 10.0f;
-const float SpectatorCoords::thetaMin = 1e-3f;
-const float SpectatorCoords::thetaMax = D3DX_PI - thetaMin;
-const float SpectatorCoords::rMin = 0.1f;
 
 
 const LPCTSTR ShaderFileName = L"shader.vsh";
 
 
 const D3D::Vertex* const vertices = cubeVertices;
-const UINT* const indices = cubeIndices;
-const UINT indicesCount = cubeIndicesCount;
-const UINT verticesCount = cubeVerticesCount;
+const D3D::Index* const indices = cubeIndices;
+const unsigned indicesCount = cubeIndicesCount;
+const unsigned verticesCount = cubeVerticesCount;
 
 const float FrontClippingPlane = 0.5f;
 const float BackClippingPlane = 1.0e13f;
@@ -77,7 +39,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      LPTSTR    ,
                      int       nCmdShow)
 {
- 	// TODO: Place code here.
 
 	Window mainWindow(hInstance, nCmdShow, &WndProc);
 
