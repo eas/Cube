@@ -35,8 +35,10 @@ Window::Window(	HINSTANCE hInstance, int nCmdShow, WndProcType wndProc)
 	hWnd_ = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 		WindowPostionX, WindowPostionY, WindowWidth, WindowHeight, NULL, NULL, hInstance, NULL);
 
-	if (!hWnd_)
+	if ( NULL == hWnd_)
+	{
 		throw WinApiError( GetLastError() );
+	}
 
 	ShowWindow(hWnd_, nCmdShow);
 	UpdateWindow(hWnd_);

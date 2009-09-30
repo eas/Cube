@@ -1,19 +1,21 @@
 #pragma once
 #include "graphics.h"
+#include "colors.h"
 
 #define SIZE(Array) sizeof(Array)/sizeof(Array[0]);
 
+
 const D3D::Vertex cubeVertices[] =
 {
-	D3D::Vertex( -50.0f, -50.0f, -50.0f, Red ),
-	D3D::Vertex( -50.0f,  50.0f, -50.0f, Magenta ),
-	D3D::Vertex(  50.0f,  50.0f, -50.0f, White ),
-	D3D::Vertex(  50.0f, -50.0f, -50.0f, Yellow ),
+	D3D::Vertex( -50.0f, -50.0f, -50.0f, Colors::Red ),
+	D3D::Vertex( -50.0f,  50.0f, -50.0f, Colors::Magenta ),
+	D3D::Vertex(  50.0f,  50.0f, -50.0f, Colors::White ),
+	D3D::Vertex(  50.0f, -50.0f, -50.0f, Colors::Yellow ),
 
-	D3D::Vertex( -50.0f, -50.0f,  50.0f, Black ),
-	D3D::Vertex( -50.0f,  50.0f,  50.0f, Blue ),
-	D3D::Vertex(  50.0f,  50.0f,  50.0f, Cyan ),
-	D3D::Vertex(  50.0f, -50.0f,  50.0f, Green ),
+	D3D::Vertex( -50.0f, -50.0f,  50.0f, Colors::Black ),
+	D3D::Vertex( -50.0f,  50.0f,  50.0f, Colors::Blue ),
+	D3D::Vertex(  50.0f,  50.0f,  50.0f, Colors::Cyan ),
+	D3D::Vertex(  50.0f, -50.0f,  50.0f, Colors::Green ),
 };
 const unsigned cubeVerticesCount = SIZE(cubeVertices);
 

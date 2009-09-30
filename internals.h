@@ -19,8 +19,10 @@ public:
 
 inline void CheckHwnd( HWND hWnd )
 {
-	if (!hWnd )
+	if ( NULL != hWnd )
+	{
 		throw WinApiError(GetLastError());
+	}
 }
 
 const int MaxLoadString = 100;
@@ -61,12 +63,12 @@ public:
 							r_*cosf(theta_),
 							r_*sinf(theta_)*sinf(fi_) );
 	}
-	void IncTheta() { if((theta_+=deltaTheta) > thetaMax) theta_= thetaMax; }
-	void DecTheta() { if((theta_-=deltaTheta) < thetaMin) theta_= thetaMin; }
+	void IncTheta() { if((theta_+=deltaTheta) > thetaMax){ theta_= thetaMax; } }
+	void DecTheta() { if((theta_-=deltaTheta) < thetaMin){ theta_= thetaMin; } }
 	void IncFi() { fi_ += deltaFi; }
 	void DecFi() { fi_ -= deltaFi; }
 	void IncR() { r_ += deltaR; }
-	void DecR() { if((r_-=deltaR) < rMin) r_ = rMin; }
+	void DecR() { if((r_-=deltaR) < rMin){ r_ = rMin; } }
 
 
 private:
