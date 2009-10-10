@@ -12,10 +12,11 @@
 #include "colors.h"
 
 #include "cube_consts.h"
+#include <tchar.h>
 
 
 
-const LPCTSTR ShaderFileName = L"shader.vsh";
+const LPCTSTR ShaderFileName = _T("shader.vsh");
 
 
 const D3D::Vertex* const vertices = cubeVertices;
@@ -125,10 +126,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				pSpectatorCoords->IncTheta();
 				break;
 			case VK_RIGHT:
-				pSpectatorCoords->IncFi();
+				pSpectatorCoords->IncPhi();
 				break;
 			case VK_LEFT:
-				pSpectatorCoords->DecFi();
+				pSpectatorCoords->DecPhi();
 				break;
 			case VK_NEXT:
 			case 'S':
